@@ -1,0 +1,4 @@
+create table if not exists app_user(id bigint auto_increment primary key,username varchar(30) not null unique,password varchar(100) not null,role varchar(20) not null);
+create table if not exists project(id bigint auto_increment primary key,name varchar(80) not null,description varchar(500),owner_id bigint not null,created_at timestamp not null);
+create table if not exists task_item(id bigint auto_increment primary key,project_id bigint not null,title varchar(120) not null,description varchar(1000),status varchar(20) not null,priority varchar(20) not null,assignee_id bigint,due_at timestamp,updated_at timestamp not null);
+create table if not exists audit_log(id bigint auto_increment primary key,user_id bigint not null,action varchar(60) not null,detail varchar(500),created_at timestamp not null);
