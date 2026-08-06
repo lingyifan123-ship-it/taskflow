@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: taskflow
+      MYSQL_USER: taskflow
+      MYSQL_PASSWORD: taskflow123
+      MYSQL_ROOT_PASSWORD: root123
+    ports: ["3306:3306"]
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD","mysqladmin","ping","-h","localhost","-proot123"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD","redis-cli","ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  app:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/taskflow?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+      DB_USERNAME: taskflow
+      DB_PASSWORD: taskflow123
+      CACHE_TYPE: redis
+      REDIS_HOST: redis
+      JWT_SECRET: ${JWT_SECRET:-replace-this-before-public-deployment-123456789}
+    depends_on:
+      mysql: {condition: service_healthy}
+      redis: {condition: service_healthy}
+volumes:
+  mysql-data:
